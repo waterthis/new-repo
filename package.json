@@ -12,10 +12,16 @@
   "author": "Dolphin Mulugeta",
   "license": "ISC",
   "dependencies": {
+    "@vercel/node": "^3.0.28",
     "axios": "^1.5.1",
     "dotenv": "^16.3.1",
     "pexels": "^1.4.0",
-    "telegraf": "^4.14.0",
-    "@vercel/node": "^3.0.28"
+    "telegraf": "^4.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.8",
+    "@vercel/ncc": "^0.38.1",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5"
   }
 }
