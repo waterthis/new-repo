@@ -49,10 +49,8 @@ picture_command(bot);
 
 default_command(bot);
 
-const startVercel = async (req, res) => {
+module.exports.startVercel = async (req, res) => {
   await production(req, res, bot);
 };
-
-module.exports =  { startVercel };
 
 ENVIRONMENT !== "production" && development(bot);
