@@ -161,6 +161,11 @@ const STEP_2 = async (ctx) => {
     const API_CALL = `${process.env.NEWS_PROVIDER}${user_selection}${process.env.NEWS_API_KEY}`;
 
     try {
+      await ctx.reply("Loading news. . .");
+    } catch (error) {
+      console.log("Can't display message.");
+    }
+    try {
       const response = await axios(API_CALL);
       if (response.statusText === "OK") {
         ctx.session.allNews = response.data.articles;
