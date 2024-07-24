@@ -194,6 +194,10 @@ newsWizard.action(["home"], async (ctx) => {
   try {
     await ctx.answerCbQuery();
     await ctx.deleteMessage();
+  } catch (error) {
+    console.log("Couldn't delete message.");
+  }
+  try {
     await ctx.reply("Hit /start to continue.", {
       reply_markup: { remove_keyboard: true },
     });
