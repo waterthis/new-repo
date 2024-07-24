@@ -106,7 +106,12 @@ async function handleAstronomyRequest(ctx) {
   const apiCall = `${process.env.WEATHER_API}astronomy${process.env.WEATHER_API_KEY}&q=${latitude},${longitude}`;
 
   const response = await axios(apiCall);
-  await ctx.deleteMessage();
+  try {
+    await ctx.deleteMessage();
+    
+  } catch (error) {
+    
+  }
   const { name, country, localtime_epoch } = response.data.location;
   const date = new Date(localtime_epoch * 1000);
   const formattedDate = date.toLocaleString();
@@ -219,6 +224,7 @@ const STEP_3 = async (ctx) => {
     await ctx.reply("Processing Data . . .", {
       reply_markup: { remove_keyboard: true },
     });
+
     if (user_selection === "weather_api_astro") {
       await handleAstronomyRequest(ctx);
     } else if (user_selection === "weather_api_forecast") {
@@ -228,6 +234,7 @@ const STEP_3 = async (ctx) => {
     } else {
       await ctx.reply("Invalid entries,Please Try Again 🤗.");
     }
+
   } catch (error) {
     console.log("Something went wrong when handlingWeatherAstronomy Request");
     await ctx.reply("Something went wrong, Try Again 🤗.");

@@ -169,7 +169,7 @@ const STEP_2 = async (ctx) => {
       if (response.statusText === "OK") {
         ctx.session.allNews = response.data.articles;
         ctx.session.current_index = 0;
-        displayArticle(0, ctx, true);
+        await displayArticle(0, ctx, true);
       } else {
         await ctx.reply("Something went wrong, Try Again 🤗.");
       }
@@ -192,7 +192,7 @@ newsWizard.action(["prev", "next"], async (ctx) => {
     index = Math.min(index + 1, 9);
   }
   ctx.session.current_index = index;
-  displayArticle(index, ctx, false);
+  await displayArticle(index, ctx, false);
 });
 
 newsWizard.action(["home"], async (ctx) => {
