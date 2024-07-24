@@ -135,17 +135,23 @@ Phase of Moon is <b>${moon_phase}</b>
 }
 
 const STEP_1 = async (ctx) => {
-  await ctx.reply("Please select a service.", {
+  await ctx.reply("Please select a Service.", {
     reply_markup: {
       inline_keyboard: [
-        [{ text: "Forecast", callback_data: "weather_api_forecast" }],
+        [{ text: "Forecast 🌤️", callback_data: "weather_api_forecast" }],
         [
           {
-            text: "Current Conditions",
+            text: "Current Conditions ☁️",
             callback_data: "weather_api_current",
           },
         ],
-        [{ text: "Astronomy", callback_data: "weather_api_astro" }],
+        [{ text: "Astronomy 🌙", callback_data: "weather_api_astro" }],
+        [
+          {
+            text: `🏠 Home`,
+            callback_data: "home",
+          },
+        ],
       ],
     },
   });
@@ -153,6 +159,11 @@ const STEP_1 = async (ctx) => {
 };
 
 const STEP_2 = async (ctx) => {
+  if (ctx.updateType === "message" && ctx.update.message.text === "/cancel") {
+    await ctx.reply("Hit /start to continue.");
+    return ctx.scene.leave();
+  }
+
   if (ctx.updateType !== "callback_query") {
     await ctx.reply("Invalid entry. Select only from the provided buttons");
     return;
@@ -170,7 +181,7 @@ const STEP_2 = async (ctx) => {
 
   let message = `Please share your location, and
 Make sure location is <b>ON</b>
-Sharing location may take time`;
+Sharing location may take time \n\nType /cancel to terminate the process.`;
   await ctx.reply(message, {
     parse_mode: "HTML",
     reply_markup: {
@@ -181,6 +192,17 @@ Sharing location may take time`;
 };
 
 const STEP_3 = async (ctx) => {
+  if (ctx.updateType === "message" && ctx.update.message.text === "/cancel") {
+    try {
+      await ctx.deleteMessage();
+      await ctx.reply("Hit /start to continue.", {
+        reply_markup: { remove_keyboard: true },
+      });
+    } catch (error) {
+      console.log("Couldn't delete message.");
+    }
+    return ctx.scene.leave();
+  }
   if (
     ctx.updateType !== "message" ||
     ctx.update.message.location === undefined
@@ -216,5 +238,18 @@ const STEP_3 = async (ctx) => {
 };
 
 const weatherWizard = new WizardScene("WEATHER_WIZARD", STEP_1, STEP_2, STEP_3);
+
+weatherWizard.action(["home"], async (ctx) => {
+  try {
+    await ctx.answerCbQuery();
+    await ctx.deleteMessage();
+    await ctx.reply("Hit /start to continue.", {
+      reply_markup: { remove_keyboard: true },
+    });
+  } catch (error) {
+    console.log("Couldn't delete message.");
+  }
+  return ctx.scene.leave();
+});
 
 module.exports = weatherWizard;

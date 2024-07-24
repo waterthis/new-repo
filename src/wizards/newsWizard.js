@@ -29,6 +29,12 @@ ${
               callback_data: "next",
             },
           ],
+          [
+            {
+              text: `🏠 Home`,
+              callback_data: "home",
+            },
+          ],
         ],
       },
     });
@@ -44,6 +50,12 @@ ${
                 callback_data: "next",
               },
             ],
+            [
+              {
+                text: `🏠 Home`,
+                callback_data: "home",
+              },
+            ],
           ],
         },
       });
@@ -56,6 +68,12 @@ ${
               {
                 text: `⏪ ${index} `,
                 callback_data: "prev",
+              },
+            ],
+            [
+              {
+                text: `🏠 Home`,
+                callback_data: "home",
               },
             ],
           ],
@@ -76,6 +94,12 @@ ${
                 callback_data: "next",
               },
             ],
+            [
+              {
+                text: `🏠 Home`,
+                callback_data: "home",
+              },
+            ],
           ],
         },
       });
@@ -87,18 +111,24 @@ const STEP_1 = async (ctx) => {
   await ctx.reply("Please select a Category", {
     reply_markup: {
       inline_keyboard: [
-        [{ text: "Entertainment", callback_data: "entertainment" }],
+        [{ text: "Entertainment 🎭", callback_data: "entertainment" }],
         [
-          { text: "Technology", callback_data: "technology" },
-          { text: "Health", callback_data: "health" },
+          { text: "Technology 💻", callback_data: "technology" },
+          { text: "Health 🏥", callback_data: "health" },
         ],
         [
-          { text: "Business", callback_data: "business" },
-          { text: "Sports", callback_data: "sports" },
+          { text: "Business 💼", callback_data: "business" },
+          { text: "Sports ⚽️", callback_data: "sports" },
         ],
         [
-          { text: "General", callback_data: "general" },
-          { text: "Science", callback_data: "science" },
+          { text: "General 🌍", callback_data: "general" },
+          { text: "Science 🔬", callback_data: "science" },
+        ],
+        [
+          {
+            text: `🏠 Home`,
+            callback_data: "home",
+          },
         ],
       ],
     },
@@ -159,6 +189,18 @@ newsWizard.action(["prev", "next"], async (ctx) => {
   }
   ctx.session.current_index = index;
   displayArticle(index, ctx, false);
+});
+newsWizard.action(["home"], async (ctx) => {
+  try {
+    await ctx.answerCbQuery();
+    await ctx.deleteMessage();
+    await ctx.reply("Hit /start to continue.", {
+      reply_markup: { remove_keyboard: true },
+    });
+  } catch (error) {
+    console.log("Couldn't delete message.");
+  }
+  return ctx.scene.leave();
 });
 
 module.exports = newsWizard;
