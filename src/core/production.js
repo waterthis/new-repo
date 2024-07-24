@@ -19,6 +19,7 @@ module.exports = async (req, res, bot) => {
   }
 
   if (req.method === "POST") {
+    console.log(req.body);
     await bot.handleUpdate(req.body, res);
   } else {
     res.status(200).json("Listening to bot events...");
