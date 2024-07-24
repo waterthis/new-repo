@@ -142,7 +142,6 @@ const STEP_2 = async (ctx) => {
   }
   try {
     await ctx.deleteMessage();
-    await ctx.answerCbQuery("Selected " + user_selection);
   } catch (error) {
     console.log("Can't delete message.");
   }
@@ -159,7 +158,7 @@ const STEP_2 = async (ctx) => {
 
   if (categories.includes(user_selection)) {
     const API_CALL = `${process.env.NEWS_PROVIDER}${user_selection}${process.env.NEWS_API_KEY}`;
-
+    
     try {
       await ctx.reply("Loading news. . .");
     } catch (error) {
@@ -195,6 +194,7 @@ newsWizard.action(["prev", "next"], async (ctx) => {
   ctx.session.current_index = index;
   displayArticle(index, ctx, false);
 });
+
 newsWizard.action(["home"], async (ctx) => {
   try {
     await ctx.answerCbQuery();
