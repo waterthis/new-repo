@@ -1,6 +1,11 @@
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 const axios = require("axios");
 const pexels = require("pexels");
-const client = pexels.createClient(process.env.PEXELS_API_TOKEN);
+const PICTURE_API = process.env.PEXELS_API_TOKEN;
+const client = pexels.createClient(PICTURE_API);
 
 module.exports = (bot) => {
   bot.command(["picture", "Picture"], async (ctx) => {

@@ -1,32 +1,20 @@
 {
-  "name": "new-repo",
-  "version": "1.1.0",
-  "description": "Telegram Bot",
+  "name": "api-bot",
+  "version": "1.0.0",
+  "description": "",
   "main": "src/index.js",
-  "author": "Dolphin Mulugeta",
-  "dependencies": {
-    "@vercel/node": "^3.0.28",
-    "axios": "^1.7.2",
-    "dotenv-cli": "^7.4.1",
-    "telegraf": "^4.16.0",
-    "dotenv": "^16.3.1",
-    "pexels": "^1.4.0"
-  },
-  "devDependencies": {
-    "@types/debug": "^4.1.12",
-    "@types/node": "^20.12.8",
-    "@vercel/ncc": "^0.38.1",
-    "debug": "^4.3.4",
-    "nodemon": "^3.1.0",
-    "prettier": "^3.2.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
-  },
   "scripts": {
-    "dev": "DEBUG=bot* dotenv -- nodemon -e ts -x ts-node src/index.ts",
-    "devWindows": "@powershell -Command $env:DEBUG='bot*';dotenv -- -- nodemon -e ts -x ts-node src/index.ts",
+    "start": "node src/index.js",
     "build": "ncc build src/index.js -o public -m",
-    "prettier": "prettier --write 'src/**/*.ts'",
-    "lint": "tsc --noemit"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dolphin Mulugeta",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.1",
+    "dotenv": "^16.3.1",
+    "pexels": "^1.4.0",
+    "telegraf": "^4.14.0",
+    "@vercel/ncc": "^0.38.1"
   }
 }

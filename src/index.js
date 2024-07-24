@@ -1,4 +1,6 @@
-require("dotenv").config();
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const { Telegraf, session, Scenes } = require("telegraf");
 const { Stage } = require("telegraf/scenes");
 
@@ -25,7 +27,7 @@ const {
 
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
 const ENVIRONMENT = process.env.NODE_ENV || "";
-
+console.log(BOT_TOKEN)
 const bot = new Telegraf(BOT_TOKEN);
 
 const stage = new Stage();
