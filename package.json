@@ -14,15 +14,17 @@
   "author": "Dolphin Mulugeta",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "pexels": "^1.4.0",
+    "@vercel/ncc": "^0.38.1",
     "@vercel/node": "^3.0.28",
     "axios": "^1.7.2",
+    "dotenv": "^16.3.1",
     "dotenv-cli": "^7.4.1",
-    "telegraf": "^4.16.0",
-    "@vercel/ncc": "^0.38.1"
+    "netlify-lambda": "^2.0.16",
+    "pexels": "^1.4.0",
+    "telegraf": "^4.16.0"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.142",
     "@types/debug": "^4.1.12",
     "@types/node": "^20.12.8",
     "@vercel/ncc": "^0.38.1",
