@@ -1,13 +1,23 @@
-const path = require('path');
-const dotenv = require('dotenv');
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// import path from "path";
+// import dotenv from "dotenv"
+import { Telegraf} from "telegraf";
+import { MyContext} from "../types";
+import {Photo} from "pexels/dist/types"
+// dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-const axios = require("axios");
-const pexels = require("pexels");
+import axios from "axios";
+import {createClient} from "pexels"
+import { InlineQueryResult} from "telegraf/types";
+
 const PICTURE_API = process.env.PEXELS_API_TOKEN;
-const client = pexels.createClient(PICTURE_API);
 
-module.exports = (bot) => {
+if (!PICTURE_API) {
+  throw new Error("PEXELS_API_TOKEN is not defined");
+}
+
+const client = createClient(PICTURE_API as string);
+
+const pictureCommand = (bot : Telegraf<MyContext>) => {
   bot.command(["picture", "Picture"], async (ctx) => {
     let message = `PLEASE SELECT <b>DOMAIN</b>
 
@@ -34,16 +44,16 @@ And enter your Search on <b>Inline Mode</b> after domain name`;
   });
 
   bot.inlineQuery(/pixabay\s.+/, async (ctx) => {
-    // console.log(ctx.inlineQuery.query);
     let input = ctx.inlineQuery.query.split(" ");
     input.shift();
     let query = input.join(" ");
-
     let response = await axios(process.env.PIXABAY_API + query);
-    // console.log(response.statusText);
 
-    let pictures = response.data.hits.map((each_picture) => {
-      return {
+    let pictures: InlineQueryResult[] = [];
+    
+    for (let i = 0; i < response.data.hits.length; i++) {
+      let each_picture = response.data.hits[i];
+      pictures.push({
         type: "photo",
         id: each_picture.id,
         photo_url: each_picture.webformatURL,
@@ -52,9 +62,8 @@ And enter your Search on <b>Inline Mode</b> after domain name`;
         photo_height: each_picture.imageHeight,
         caption: `[Source](${each_picture.webformatURL})  [Larger File](${each_picture.largeImageURL})`,
         parse_mode: "Markdown",
-      };
-    });
-    // console.log(pictures);
+      });
+    }
 
     await ctx.answerInlineQuery(pictures);
   });
@@ -72,22 +81,29 @@ And enter your Search on <b>Inline Mode</b> after domain name`;
         per_page: 50,
       });
 
-      let pictures = response.photos.map((each_picture) => {
-        return {
+      if ('error' in response) {
+        console.error(response.error);
+        return [];
+      }
+
+      let pictures: InlineQueryResult[] = [];
+
+      for (let i = 0; i < response.photos.length; i++) {
+        let each_picture:Photo = response.photos[i];
+        pictures.push({
           type: "photo",
-          id: each_picture.id,
-          thumbnail_url:each_picture.src.tiny,
+          id: String(each_picture.id),
+          thumbnail_url: each_picture.src.tiny,
           photo_url: each_picture.src.original,
           photo_width: each_picture.width,
           photo_height: each_picture.height,
           caption: `
-[${each_picture.alt}](${each_picture.url})
-
-[Large File](${each_picture.src.large})`,
+      [${each_picture.alt}](${each_picture.url})
+      
+      [Large File](${each_picture.src.large})`,
           parse_mode: "Markdown",
-        };
-      });
-      // console.log(pictures);
+        });
+      }
 
       await ctx.answerInlineQuery(pictures);
     } catch (err) {
@@ -96,3 +112,5 @@ And enter your Search on <b>Inline Mode</b> after domain name`;
     }
   });
 };
+
+export {pictureCommand};

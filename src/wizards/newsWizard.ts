@@ -1,7 +1,8 @@
 const { WizardScene } = require("telegraf/scenes");
 const axios = require("axios");
+import { MyContext } from "../types";
 
-const displayArticle = async (index, ctx, first) => {
+const displayArticle = async (index:number, ctx:MyContext, first:boolean) => {
   const allNews = ctx.session.allNews;
   const the_date = allNews[index].publishedAt.split("T")[0];
   const the_time = allNews[index].publishedAt.split("T")[1].slice(0, -4);
@@ -107,7 +108,7 @@ ${
   }
 };
 
-const STEP_1 = async (ctx) => {
+const STEP_1 = async (ctx:MyContext) => {
   await ctx.reply("Please select a Category", {
     reply_markup: {
       inline_keyboard: [
@@ -135,7 +136,7 @@ const STEP_1 = async (ctx) => {
   });
   return ctx.wizard.next();
 };
-const STEP_2 = async (ctx) => {
+const STEP_2 = async (ctx:MyContext) => {
   if (ctx.updateType !== "callback_query") {
     await ctx.reply("Invalid entry. Select only from the provided buttons");
     return;
@@ -154,6 +155,7 @@ const STEP_2 = async (ctx) => {
     "technology",
     "entertainment",
   ];
+  if (("callback_query" in ctx.update) && ("data" in ctx.update.callback_query)) {
   const user_selection = ctx.update.callback_query.data;
 
   if (categories.includes(user_selection)) {
@@ -175,27 +177,41 @@ const STEP_2 = async (ctx) => {
       }
     } catch (error) {
       await ctx.reply("Something went wrong, Try Again 🤗.");
-      console.log(error.message);
+    
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log("An unknown error occurred");
+      }
     }
   } else {
     await ctx.reply("Invalid category selected,Try Again 🤗");
   }
+} else{
+  await ctx.reply("Something went wrong try again 🤗.");
+  console.log("Message does not contain text");
+  return ctx.scene.leave();
+}
+
 };
 
 const newsWizard = new WizardScene("NEWS_WIZARD", STEP_1, STEP_2);
 
-newsWizard.action(["prev", "next"], async (ctx) => {
-  let index = ctx.session.current_index;
-  if (ctx.match[0] === "prev") {
-    index = Math.max(index - 1, 0);
-  } else if (ctx.match[0] === "next") {
-    index = Math.min(index + 1, 9);
+newsWizard.action(["prev", "next"], async (ctx:MyContext) => {
+  if ("match" in ctx){
+    let index = ctx.session.current_index;
+    const user_selection = (ctx.match as string[])[0];
+     if (user_selection === "prev") {
+      index = Math.max(index - 1, 0);
+    } else if (user_selection === "next") {
+      index = Math.min(index + 1, 9);
+    }
+    ctx.session.current_index = index;
+    await displayArticle(index, ctx, false);
   }
-  ctx.session.current_index = index;
-  await displayArticle(index, ctx, false);
 });
 
-newsWizard.action(["home"], async (ctx) => {
+newsWizard.action(["home"], async (ctx:MyContext) => {
   try {
     await ctx.answerCbQuery();
     await ctx.deleteMessage();
@@ -212,4 +228,4 @@ newsWizard.action(["home"], async (ctx) => {
   return ctx.scene.leave();
 });
 
-module.exports = newsWizard;
+export {newsWizard};

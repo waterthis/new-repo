@@ -1,4 +1,6 @@
-module.exports = (bot) => {
+import { Telegraf } from "telegraf";
+import { MyContext } from "../types";
+const helpCommand = (bot : Telegraf<MyContext>) => {
   bot.command(["help", "Help"], async (ctx) => {
     const help_message = `
   This bot 🤖 is designed to entertain and inform you. You can use this bot anytime 🕒 and anywhere. 
@@ -16,3 +18,5 @@ Have Fun 🎉
     await ctx.reply(help_message);
   });
 };
+
+export {helpCommand}

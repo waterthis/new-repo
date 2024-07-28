@@ -1,7 +1,8 @@
-const { WizardScene } = require("telegraf/scenes");
-const axios = require("axios");
+import { WizardScene } from "telegraf/scenes";
+import axios from "axios";
+import { MyContext } from "../types";
 
-async function handleFocastRequest(ctx) {
+async function handleFocastRequest(ctx:MyContext) {
   const user_location = ctx.session.user_location;
 
   const latitude = user_location.latitude;
@@ -44,14 +45,14 @@ async function handleFocastRequest(ctx) {
     });
   } catch (error) {
     console.log("Something went wrong when handling forecast weather request");
-    console.log(err);
+    console.log(error);
   }
 }
 
 /**********************************
   CURRENT REQUEST HANDLER
 *********************************/
-async function handleCurrentRequest(ctx) {
+async function handleCurrentRequest(ctx:MyContext) {
   const user_location = ctx.session.user_location;
 
   const latitude = user_location.latitude;
@@ -90,14 +91,14 @@ Wind speed of <b>${windSpeed}</b> m/s with direction of <b>${windDirection}°</b
     });
   } catch (error) {
     console.log("Something went wrong when handling current weather request");
-    console.log(err);
+    console.log(error);
   }
 }
 
 /**********************************
   ASTRONOMY REQUEST HANDLER
 *********************************/
-async function handleAstronomyRequest(ctx) {
+async function handleAstronomyRequest(ctx:MyContext) {
   const user_location = ctx.session.user_location;
 
   const latitude = user_location.latitude;
@@ -139,7 +140,7 @@ Phase of Moon is <b>${moon_phase}</b>
   );
 }
 
-const STEP_1 = async (ctx) => {
+const STEP_1 = async (ctx:MyContext) => {
   await ctx.reply("Please select a Service.", {
     reply_markup: {
       inline_keyboard: [
@@ -163,8 +164,8 @@ const STEP_1 = async (ctx) => {
   return ctx.wizard.next();
 };
 
-const STEP_2 = async (ctx) => {
-  if (ctx.updateType === "message" && ctx.update.message.text === "/cancel") {
+const STEP_2 = async (ctx:MyContext) => {
+  if (ctx.updateType === "message" && "message" in ctx.update && "text" in ctx.update.message && ctx.update.message.text === "/cancel") {
     await ctx.reply("Hit /start to continue.");
     return ctx.scene.leave();
   }
@@ -174,6 +175,7 @@ const STEP_2 = async (ctx) => {
     return;
   }
 
+  if (("callback_query" in ctx.update) && ("data" in ctx.update.callback_query)) {
   const user_selection = ctx.update.callback_query.data;
   ctx.session.user_selection = user_selection;
 
@@ -183,7 +185,7 @@ const STEP_2 = async (ctx) => {
   } catch (error) {
     console.log("Couldn't delete message.");
   }
-
+  }
   let message = `Please share your location, and
 Make sure location is <b>ON</b>
 Sharing location may take time \n\nType /cancel to terminate the process.`;
@@ -196,8 +198,8 @@ Sharing location may take time \n\nType /cancel to terminate the process.`;
   return ctx.wizard.next();
 };
 
-const STEP_3 = async (ctx) => {
-  if (ctx.updateType === "message" && ctx.update.message.text === "/cancel") {
+const STEP_3 = async (ctx:MyContext) => {
+  if (ctx.updateType === "message"  && "message" in ctx.update && "text" in ctx.update.message && ctx.update.message.text === "/cancel") {
     try {
       await ctx.deleteMessage();
       await ctx.reply("Hit /start to continue.", {
@@ -208,13 +210,23 @@ const STEP_3 = async (ctx) => {
     }
     return ctx.scene.leave();
   }
+
   if (
-    ctx.updateType !== "message" ||
-    ctx.update.message.location === undefined
+    ctx.updateType !== "message"
   ) {
     await ctx.reply("Invalid entry. Select send only your Location");
     return;
   }
+  if (ctx.updateType === "message"  && "message" in ctx.update &&
+    "location" in ctx.update.message && ctx.update.message.location === undefined
+  ) {
+    await ctx.reply("Invalid entry. Select send only your Location");
+    return;
+  }
+
+  if (ctx.updateType === "message"  && "message" in ctx.update &&
+    "location" in ctx.update.message && ctx.update.message.location === undefined
+  ) {
 
   const user_location = ctx.update.message.location;
   ctx.session.user_location = user_location;
@@ -236,10 +248,16 @@ const STEP_3 = async (ctx) => {
     }
 
   } catch (error) {
-    console.log("Something went wrong when handlingWeatherAstronomy Request");
     await ctx.reply("Something went wrong, Try Again 🤗.");
-    console.log(error.message);
+    console.log("Something went wrong when handlingWeatherAstronomy Request");
+    
+    if (error instanceof Error) {
+      console.log(error.message);
+    } else {
+      console.log("An unknown error occurred");
+    }
   }
+}
 
   return ctx.scene.leave();
 };
@@ -259,4 +277,4 @@ weatherWizard.action(["home"], async (ctx) => {
   return ctx.scene.leave();
 });
 
-module.exports = weatherWizard;
+export {weatherWizard};
