@@ -4,7 +4,7 @@ import { MyContext } from "../types";
 const KANYE_API = process.env.KANYE_PROVIDER;
 
 if (!KANYE_API) {
-  throw new Error("KANYE PROVIDER is not defined");
+  throw new Error("KANYE_PROVIDER is not defined");
 }
 const kanyeCommand = (bot : Telegraf<MyContext>) => {
   bot.command(["kanye", "Kanye"], async (ctx) => {
